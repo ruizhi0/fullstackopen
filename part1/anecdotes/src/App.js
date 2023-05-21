@@ -28,8 +28,30 @@ const App = () => {
     setVotes(cloneVotes)
   }
 
+  const indexOfMax = (array) => {
+    if (array.length === 0)
+      return -1
+
+    var max = array[0]
+    var maxIndex = 0
+
+    for (let i = 0; i < array.length; i++) {
+      const value = array[i]
+
+      if (value > max) {
+        max = value
+        maxIndex = i
+      }
+    }
+
+    return maxIndex
+  }
+
+  const mostVotedAnecdote = anecdotes[indexOfMax(votes)]
+
   return (
     <>
+      <h1>Anecdote of the day</h1>
       <div>
         {anecdotes[selected]}
       </div>
@@ -42,6 +64,9 @@ const App = () => {
       <button onClick={handleNextAnecdoteClick}>
         next anecdote
       </button>
+
+      <h1>Anecdote with most votes</h1>
+      <p>{mostVotedAnecdote}</p>
     </>
   )
 }
