@@ -23,7 +23,7 @@ const App = () => {
       <Button handleClick={handleGoodClick} text='good' />
       <Button handleClick={handleNeutralClick} text='neutral' />
       <Button handleClick={handleBadClick} text='bad' />
-      
+
       <Statistics good={good} neutral={neutral} bad={bad} />
     </div>
   )
@@ -48,20 +48,25 @@ const Statistics = ({ good, neutral, bad }) => {
   return (
     <>
       <h1>statistics</h1>
-      <StatisticLine text='good' value={good} />
-      <StatisticLine text='neutral' value={neutral} />
-      <StatisticLine text='bad' value={bad} />
-      <StatisticLine text='all' value={total} />
-      <StatisticLine text='average' value={average.toFixed(4)} />
-      <StatisticLine text='positive' value={`${positive.toFixed(2)}%`} />
+      <table>
+        <tbody>
+          <StatisticLine text='good' value={good} />
+          <StatisticLine text='neutral' value={neutral} />
+          <StatisticLine text='bad' value={bad} />
+          <StatisticLine text='all' value={total} />
+          <StatisticLine text='average' value={average.toFixed(4)} />
+          <StatisticLine text='positive' value={`${positive.toFixed(2)}%`} />
+        </tbody>
+      </table>
     </>
   )
 }
 
 const StatisticLine = ({ text, value }) => (
-  <p>
-    {text} {value}
-  </p>
+  <tr>
+    <td>{text}</td>
+    <td>{value}</td>
+  </tr>
 )
 
 const Button = ({ handleClick, text }) => (
