@@ -31,6 +31,16 @@ const App = () => {
 
 const Statistics = ({ good, neutral, bad }) => {
   const total = good + neutral + bad
+
+  if (total === 0) {
+    return (
+      <>
+        <h1>statistics</h1>
+        <p>No feedback given</p>
+      </>
+    )
+  }
+
   const score = (good * 1) + (neutral * 0) + (bad * -1)
   const average = score / total
   const positive = good / total * 100
