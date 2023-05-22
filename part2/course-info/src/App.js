@@ -21,8 +21,8 @@ const App = () => {
         id: 3
       },
       {
-        name: 'JavaScript array',
-        exercises: 8,
+        name: 'Redux',
+        exercises: 11,
         id: 4
       }
     ]
