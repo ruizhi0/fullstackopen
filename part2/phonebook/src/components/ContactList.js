@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const ContactList = ({ contacts }) => {
+const ContactList = ({ contacts, handleRemoveContact }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearchTermChange = (e) => {
@@ -20,7 +20,8 @@ const ContactList = ({ contacts }) => {
       <ul>
         {filteredContacts.map((contact) => (
           <li key={contact.id}>
-            {contact.name} {contact.number}
+            {contact.name} {contact.number}{" "}
+            <button onClick={() => handleRemoveContact(contact)}>delete</button>
           </li>
         ))}
       </ul>

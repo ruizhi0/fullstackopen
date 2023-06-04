@@ -12,11 +12,22 @@ const App = () => {
     });
   }, []);
 
+  const handleRemoveContact = (contact) => {
+    if (window.confirm(`Remove ${contact.name}?`)) {
+      contactService.remove(contact.id).then(() => {
+        setContacts(contacts.filter((c) => c.id !== contact.id));
+      });
+    }
+  };
+
   return (
     <div>
       <h1>Phonebook</h1>
       <CreateContactForm contacts={contacts} setContacts={setContacts} />
-      <ContactList contacts={contacts} />
+      <ContactList
+        contacts={contacts}
+        handleRemoveContact={handleRemoveContact}
+      />
     </div>
   );
 };
