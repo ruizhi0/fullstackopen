@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import CreateContactForm from "./components/CreateContactForm";
 import ContactList from "./components/ContactList";
+import contactService from "./services/contacts";
 
 const App = () => {
   const [contacts, setContacts] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((res) => {
-      console.log("total contact from api", res.data.length);
-      setContacts(res.data);
+    contactService.getAll().then((contacts) => {
+      setContacts(contacts);
     });
   }, []);
 

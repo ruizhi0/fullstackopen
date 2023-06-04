@@ -1,4 +1,5 @@
 import { useState } from "react";
+import contactService from "../services/contacts";
 
 const CreateContactForm = ({ contacts, setContacts }) => {
   const [newContactName, setNewContactName] = useState("");
@@ -15,13 +16,15 @@ const CreateContactForm = ({ contacts, setContacts }) => {
   const addNewContact = (e) => {
     e.preventDefault();
 
-    const contact = {
+    const newContact = {
       id: contacts.length + 1,
       name: newContactName,
       number: newContactNumber,
     };
 
-    setContacts(contacts.concat(contact));
+    contactService.create(newContact).then((createdContact) => {
+      setContacts(contacts.concat(createdContact));
+    });
     resetContactFormFields();
   };
 
