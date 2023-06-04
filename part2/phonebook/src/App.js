@@ -12,8 +12,12 @@ const App = () => {
     });
   }, []);
 
+  const confirmRemoveContact = (contact) => {
+    return window.confirm(`Remove ${contact.name}?`);
+  };
+
   const handleRemoveContact = (contact) => {
-    if (window.confirm(`Remove ${contact.name}?`)) {
+    if (confirmRemoveContact(contact)) {
       contactService.remove(contact.id).then(() => {
         setContacts(contacts.filter((c) => c.id !== contact.id));
       });
