@@ -14,4 +14,5 @@ export default interface Country {
     png: string;
     svg: string;
   };
+  latlng: string[];
 }
