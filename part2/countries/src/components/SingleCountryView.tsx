@@ -1,5 +1,9 @@
 import Country from "../types/Country";
-const SingleCountryView = ({ country }: { country: Country }) => {
+const SingleCountryView = ({ country }: { country: Country | null }) => {
+  if (!country) {
+    return null;
+  }
+
   return (
     <div>
       <h1>{country.name.common}</h1>
