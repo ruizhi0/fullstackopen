@@ -1,12 +1,30 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import Note from "./components/Note";
 import noteService from "./services/notes";
+import Notification from "./components/Notification";
+
+const Footer = () => {
+  const style = {
+    color: "green",
+    fontStyle: "italic",
+    fontSize: 16,
+  };
+
+  return (
+    <div style={style}>
+      <br />
+      <em>
+        Note app, Department of Computer Science, University of Helsinki 2023
+      </em>
+    </div>
+  );
+};
 
 const App = () => {
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState("");
   const [showAll, setShowAll] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("Error");
 
   useEffect(() => {
     noteService.getAll().then((notes) => {
@@ -41,7 +59,10 @@ const App = () => {
         setNotes(notes.map((note) => (note.id !== id ? note : updatedNote)));
       })
       .catch((error) => {
-        alert(`note with id=${id} not found`);
+        setErrorMessage(`Note with id=${id} not found`);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
         setNotes(notes.filter((note) => note.id !== id));
       });
   };
@@ -51,6 +72,7 @@ const App = () => {
   return (
     <div>
       <h1>Notes</h1>
+      <Notification message={errorMessage} />
       <div>
         <button onClick={() => setShowAll(!showAll)}>
           show {showAll ? "important" : "all"}
@@ -71,6 +93,8 @@ const App = () => {
         <input value={newNote} onChange={handleNoteChange} />
         <button type="submit">save</button>
       </form>
+
+      <Footer />
     </div>
   );
 };
