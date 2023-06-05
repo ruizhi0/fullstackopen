@@ -6,6 +6,7 @@ const CreateContactForm = ({ contacts, setContacts }) => {
   const [newContactName, setNewContactName] = useState("");
   const [newContactNumber, setNewContactNumber] = useState("");
   const [notificationMessage, setNotificationMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleCreateContact = (e) => {
     e.preventDefault();
@@ -19,13 +20,14 @@ const CreateContactForm = ({ contacts, setContacts }) => {
         updateContact(existingContactWithNewName);
         resetContactFormFields();
         setTemporaryNotificationMessage(
-          `Updated ${existingContactWithNewName.name}`
+          `Updated ${existingContactWithNewName.name}`,
+          true
         );
       }
     } else {
       const createdContact = createContact();
       resetContactFormFields();
-      setTemporaryNotificationMessage(`Added ${createdContact.name}`);
+      setTemporaryNotificationMessage(`Added ${createdContact.name}`, true);
     }
   };
 
@@ -47,7 +49,14 @@ const CreateContactForm = ({ contacts, setContacts }) => {
         setContacts(
           contacts.map((c) => (c.id !== updatedContact.id ? c : updatedContact))
         )
-      );
+      )
+      .catch((error) => {
+        setContacts(contacts.filter((c) => c.id !== contactToUpdate.id));
+        setTemporaryNotificationMessage(
+          `Information of ${contactToUpdate.name} has already been removed from server`,
+          false
+        );
+      });
   };
 
   const createContact = () => {
@@ -64,7 +73,8 @@ const CreateContactForm = ({ contacts, setContacts }) => {
     return newContact;
   };
 
-  const setTemporaryNotificationMessage = (message) => {
+  const setTemporaryNotificationMessage = (message, isSuccessStatus) => {
+    setIsSuccess(isSuccessStatus);
     setNotificationMessage(message);
     resetNotificationMessage();
   };
@@ -90,7 +100,7 @@ const CreateContactForm = ({ contacts, setContacts }) => {
 
   return (
     <div>
-      <Notification message={notificationMessage} />
+      <Notification message={notificationMessage} isSuccess={isSuccess} />
       <form onSubmit={handleCreateContact}>
         <div>
           Name:{" "}
