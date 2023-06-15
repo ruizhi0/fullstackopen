@@ -9,13 +9,8 @@ const requestLogger = (req, res, next) => {
   next();
 };
 
-const unknownEndpoint = (req, res) => {
-  res.status(404).send({ error: "Unknown endpoint" });
-};
-
 app.use(express.json());
 app.use(requestLogger);
-app.use(unknownEndpoint);
 
 let notes = [
   {
@@ -95,3 +90,9 @@ const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+const unknownEndpoint = (req, res) => {
+  res.status(404).send({ error: "Unknown endpoint" });
+};
+
+app.use(unknownEndpoint);
