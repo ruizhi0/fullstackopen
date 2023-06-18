@@ -9,7 +9,8 @@
     "build:ui": "@powershell Remove-Item -Recurse -Force build && cd ../part2 && npm run build && @powershell Copy-Item build -Recurse ../part3",
     "deploy": "fly deploy",
     "deploy:full": "npm run build:ui && npm run deploy",
-    "logs:prod": "fly logs"
+    "logs:prod": "fly logs",
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "Rui Zhi Liew",
@@ -21,6 +22,7 @@
     "mongoose": "^7.3.0"
   },
   "devDependencies": {
+    "eslint": "^8.43.0",
     "nodemon": "^2.0.22"
   }
 }

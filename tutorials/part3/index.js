@@ -29,34 +29,55 @@ app.get("/api/notes", (req, res) => {
   });
 });
 
-app.get("/api/notes/:id", (req, res) => {
+app.get("/api/notes/:id", (req, res, next) => {
   Note.findById(req.params.id)
     .then((note) => {
-      res.json(note);
+      if (note) {
+        res.json(note);
+      } else {
+        res.status(404).end();
+      }
     })
-    .catch((error) => {
-      res.status(404).end();
-    });
+    .catch((error) => next(error));
 });
 
-app.delete("/api/notes/:id", (req, res) => {
-  Note.findByIdAndDelete(req.params.id).then((deletedNote) => {
-    if (deletedNote) {
-      res.status(204).end();
-    } else {
-      res.status(404).end();
-    }
-  });
+app.put("/api/notes/:id", (req, res, next) => {
+  const { content, important } = req.body;
+
+  const note = {
+    content,
+    important,
+  };
+
+  Note.findByIdAndUpdate(req.params.id, note, {
+    new: true,
+    runValidators: true,
+    context: "query",
+  })
+    .then((updatedNote) => {
+      if (updatedNote) {
+        res.json(updatedNote);
+      } else {
+        res.status(404).end();
+      }
+    })
+    .catch((error) => next(error));
 });
 
-app.post("/api/notes", (req, res) => {
+app.delete("/api/notes/:id", (req, res, next) => {
+  Note.findByIdAndDelete(req.params.id)
+    .then((deletedNote) => {
+      if (deletedNote) {
+        res.status(204).end();
+      } else {
+        res.status(404).end();
+      }
+    })
+    .catch((error) => next(error));
+});
+
+app.post("/api/notes", (req, res, next) => {
   const body = req.body;
-
-  if (!body.content) {
-    return res.status(400).json({
-      error: "missing content",
-    });
-  }
 
   const note = new Note({
     content: body.content,
@@ -68,10 +89,7 @@ app.post("/api/notes", (req, res) => {
     .then((savedNote) => {
       res.json(savedNote);
     })
-    .catch((error) => {
-      console.log("error", error);
-      res.status(500).end();
-    });
+    .catch((error) => next(error));
 });
 
 const PORT = process.env.PORT;
@@ -84,3 +102,17 @@ const unknownEndpoint = (req, res) => {
 };
 
 app.use(unknownEndpoint);
+
+const errorHandler = (error, req, res, next) => {
+  console.log(error.message);
+
+  if (error.name === "CastError") {
+    return res.status(404).send({ error: "malformed id" });
+  } else if (error.name === "ValidationError") {
+    return res.status(400).json({ error: error.message });
+  }
+
+  next(error);
+};
+
+app.use(errorHandler);
