@@ -1,0 +1,9 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Determination leads to success",
+  "author": "Z",
+  "url": "https://microsoft.com/",
+  "likes": 10
+}

@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const blogsRouter = require("./controllers/blogs");
+const mongoose = require("mongoose");
 
 mongoose.connect(config.MONGODB_URI);
 
