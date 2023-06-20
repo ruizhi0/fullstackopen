@@ -1,0 +1,7 @@
+PUT http://localhost:3001/api/notes/648dc5c49576638e7ae36ed3
+Content-Type: application/json
+
+{
+    "content": "Express is actually good",
+    "important": false
+}
