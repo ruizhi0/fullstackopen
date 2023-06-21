@@ -3,15 +3,11 @@ const dummy = (blogs) => {
 };
 
 const totalLikes = (blogs) => {
-  if (blogs.length === 0) {
-    return 0;
+  if (blogs.length === 0 || blogs.length === 1) {
+    return blogs.length;
   }
 
-  if (blogs.length === 1) {
-    return 1;
-  }
-
-  const reducer = (sum, blog) => sum + blog.totalLikes;
+  const reducer = (sum, blog) => sum + blog.likes;
 
   return blogs.reduce(reducer, 0);
 };
