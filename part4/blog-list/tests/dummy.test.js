@@ -150,3 +150,35 @@ describe("most blogs", () => {
     });
   });
 });
+
+describe("most liked", () => {
+  test("of empty list is null", () => {
+    const sampleBlogs = lodash.take(blogs, 0);
+
+    const result = listHelper.mostLiked(sampleBlogs);
+
+    expect(result).toEqual(null);
+  });
+
+  test("when list has only one blog equals itself with same likes", () => {
+    const sampleBlogs = lodash.take(blogs, 1);
+
+    const result = listHelper.mostLiked(sampleBlogs);
+
+    expect(result).toEqual({
+      author: sampleBlogs[0].author,
+      likes: sampleBlogs[0].likes,
+    });
+  });
+
+  test("of a bigger list is calculated right", () => {
+    const sampleBlogs = lodash.take(blogs, blogs.length);
+
+    const result = listHelper.mostLiked(sampleBlogs);
+
+    expect(result).toEqual({
+      author: "Edsger W. Dijkstra",
+      likes: 17,
+    });
+  });
+});
