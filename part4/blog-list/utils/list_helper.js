@@ -1,3 +1,5 @@
+const lodash = require("lodash");
+
 const dummy = (blogs) => {
   return 1;
 };
@@ -27,8 +29,32 @@ const favouriteBlog = (blogs) => {
   return blogs.reduce(reducer, blogs[0]);
 };
 
+const mostBlog = (blogs) => {
+  if (blogs.length === 0) {
+    return null;
+  }
+
+  const authorBlogCountAggregates = blogs.reduce((aggr, blog) => {
+    aggr[blog.author] = (aggr[blog.author] || 0) + 1;
+    return aggr;
+  }, []);
+
+  const maxBlogCountPerAuthor = Math.max(
+    ...Object.values(authorBlogCountAggregates)
+  );
+  const mostBlogCountAggregates = Object.keys(authorBlogCountAggregates).filter(
+    (key) => authorBlogCountAggregates[key] === maxBlogCountPerAuthor
+  );
+
+  return {
+    author: mostBlogCountAggregates[0],
+    blogs: maxBlogCountPerAuthor,
+  };
+};
+
 module.exports = {
   dummy,
   totalLikes,
   favouriteBlog,
+  mostBlog,
 };
