@@ -6,16 +6,13 @@ notesRouter.get("/", async (req, res) => {
   return res.json(notes);
 });
 
-notesRouter.get("/:id", (req, res, next) => {
-  Note.findById(req.params.id)
-    .then((note) => {
-      if (note) {
-        res.json(note);
-      } else {
-        res.status(404).end();
-      }
-    })
-    .catch((error) => next(error));
+notesRouter.get("/:id", async (req, res, next) => {
+  const note = await Note.findById(req.params.id);
+  if (note) {
+    res.json(note);
+  } else {
+    res.status(404).end();
+  }
 });
 
 notesRouter.post("/", async (req, res, next) => {
@@ -26,21 +23,13 @@ notesRouter.post("/", async (req, res, next) => {
     important: body.important || false,
   });
 
-  try {
-    const savedNote = await note.save();
-    res.status(201).json(savedNote);
-  } catch (error) {
-    next(error);
-  }
+  const savedNote = await note.save();
+  res.status(201).json(savedNote);
 });
 
 notesRouter.delete("/:id", async (req, res, next) => {
-  try {
-    await Note.findByIdAndRemove(req.params.id);
-    return res.status(204).end();
-  } catch (error) {
-    next(error);
-  }
+  await Note.findByIdAndRemove(req.params.id);
+  return res.status(204).end();
 });
 
 notesRouter.put("/:id", async (req, res, next) => {
@@ -51,14 +40,10 @@ notesRouter.put("/:id", async (req, res, next) => {
     important: body.important,
   };
 
-  try {
-    const updatedNote = await Note.findByIdAndUpdate(req.params.id, note, {
-      new: true,
-    });
-    res.json(updatedNote);
-  } catch (error) {
-    next(error);
-  }
+  const updatedNote = await Note.findByIdAndUpdate(req.params.id, note, {
+    new: true,
+  });
+  res.json(updatedNote);
 });
 
 module.exports = notesRouter;
