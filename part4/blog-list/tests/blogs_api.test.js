@@ -91,10 +91,26 @@ describe("create a new blog", () => {
     ).toBe(0);
   });
 
-  test("filled none field", async () => {
-    const res = await api.post("/api/blogs").expect(400);
+  test("bad request if title is unspecified", async () => {
+    const newBlog = {
+      author: "Ray Yao",
+      url: "https://devblogs.microsoft.com/dotnet/microsoft-forms-services-journey-to-dotnet-6/",
+    };
+
+    const res = await api.post("/api/blogs").send(newBlog).expect(400);
 
     expect(res.body).toEqual({ error: "title field is required" });
+  });
+
+  test("bad request if url is unspecified", async () => {
+    const newBlog = {
+      title: "Microsoft Forms Service's Journey to .NET 6",
+      author: "Ray Yao",
+    };
+
+    const res = await api.post("/api/blogs").send(newBlog).expect(400);
+
+    expect(res.body).toEqual({ error: "url field is required" });
   });
 });
 

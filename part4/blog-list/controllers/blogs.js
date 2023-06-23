@@ -12,6 +12,11 @@ blogsRouter.post("/blogs", async (req, res) => {
     return;
   }
 
+  if (!req.body.url) {
+    res.status(400).json({ error: "url field is required" });
+    return;
+  }
+
   if (!req.body.likes) {
     req.body.likes = 0;
   }
