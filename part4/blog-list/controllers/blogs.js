@@ -8,6 +8,11 @@ blogsRouter.get("/blogs", (request, response) => {
 });
 
 blogsRouter.post("/blogs", (request, response) => {
+  if (!request.body.title) {
+    response.status(400).json({ error: "title field is required" });
+    return;
+  }
+
   const blog = new Blog(request.body);
 
   blog.save().then((result) => {
