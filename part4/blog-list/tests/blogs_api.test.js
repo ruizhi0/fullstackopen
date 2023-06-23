@@ -71,6 +71,26 @@ describe("create a new blog", () => {
     expect(titles).toContain(newBlog.title);
   });
 
+  test("likes default to zero if unspecified", async () => {
+    const newBlog = {
+      title: "Microsoft Forms Service's Journey to .NET 6",
+      author: "Ray Yao",
+      url: "https://devblogs.microsoft.com/dotnet/microsoft-forms-services-journey-to-dotnet-6/",
+    };
+
+    await api
+      .post("/api/blogs")
+      .send(newBlog)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
+
+    const latestBlogs = (await Blog.find({})).map((blog) => blog.toJSON());
+    expect(latestBlogs).toHaveLength(initialBlogs.length + 1);
+    expect(
+      latestBlogs.filter((blog) => blog.title === newBlog.title)[0].likes
+    ).toBe(0);
+  });
+
   test("filled none field", async () => {
     const res = await api.post("/api/blogs").expect(400);
 

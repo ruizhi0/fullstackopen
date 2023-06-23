@@ -12,6 +12,10 @@ blogsRouter.post("/blogs", async (req, res) => {
     return;
   }
 
+  if (!req.body.likes) {
+    req.body.likes = 0;
+  }
+
   const blog = new Blog(req.body);
   const createdBlog = await blog.save();
   res.status(201).json(createdBlog);
