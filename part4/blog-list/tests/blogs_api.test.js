@@ -40,6 +40,14 @@ describe("get blogs", () => {
 
     expect(res.body).toHaveLength(initialBlogs.length);
   });
+
+  test("each blog has 'id' field", async () => {
+    const res = await api.get("/api/blogs");
+
+    res.body.forEach((blog) => {
+      expect(blog.id).toBeDefined();
+    });
+  });
 });
 
 describe("create a new blog", () => {
