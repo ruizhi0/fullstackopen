@@ -99,7 +99,9 @@ describe("create a new blog", () => {
 
     const res = await api.post("/api/blogs").send(newBlog).expect(400);
 
-    expect(res.body).toEqual({ error: "title field is required" });
+    expect(res.body).toEqual({
+      error: "Blog validation failed: title: Path `title` is required.",
+    });
   });
 
   test("bad request if url is unspecified", async () => {
@@ -110,7 +112,9 @@ describe("create a new blog", () => {
 
     const res = await api.post("/api/blogs").send(newBlog).expect(400);
 
-    expect(res.body).toEqual({ error: "url field is required" });
+    expect(res.body).toEqual({
+      error: "Blog validation failed: url: Path `url` is required.",
+    });
   });
 });
 
@@ -120,17 +124,13 @@ describe("delete a blog", () => {
     const existingBlog = latestBlogs[0].toJSON();
     const id = existingBlog.id;
 
-    const res = await api.delete(`/api/blogs/${id}`);
-
-    expect(res.status).toBe(204);
+    await api.delete(`/api/blogs/${id}`).expect(204);
   });
 
   test("not found blog", async () => {
     const id = "000000000000000000000000";
 
-    const res = await api.delete(`/api/blogs/${id}`);
-
-    expect(res.status).toBe(404);
+    await api.delete(`/api/blogs/${id}`).expect(404);
   });
 
   test("malformed id", async () => {
