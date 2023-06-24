@@ -114,6 +114,35 @@ describe("create a new blog", () => {
   });
 });
 
+describe("delete a blog", () => {
+  test("existing blog", async () => {
+    const latestBlogs = await Blog.find({});
+    const existingBlog = latestBlogs[0].toJSON();
+    const id = existingBlog.id;
+
+    const res = await api.delete(`/api/blogs/${id}`);
+
+    expect(res.status).toBe(204);
+  });
+
+  test("not found blog", async () => {
+    const id = "000000000000000000000000";
+
+    const res = await api.delete(`/api/blogs/${id}`);
+
+    expect(res.status).toBe(404);
+  });
+
+  test("malformed id", async () => {
+    const id = "jfdlka";
+
+    const res = await api.delete(`/api/blogs/${id}`);
+
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({ error: "malformed id" });
+  });
+});
+
 afterAll(async () => {
   mongoose.connection.close();
 });
