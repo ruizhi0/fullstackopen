@@ -133,10 +133,56 @@ describe("delete a blog", () => {
     await api.delete(`/api/blogs/${id}`).expect(404);
   });
 
-  test("malformed id", async () => {
+  test("bad request if id is malformed", async () => {
     const id = "jfdlka";
 
     const res = await api.delete(`/api/blogs/${id}`);
+
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({ error: "malformed id" });
+  });
+});
+
+describe("update a blog", () => {
+  test("liked the blog", async () => {
+    const returnedBlogs = await Blog.find({
+      url: "https://devblogs.microsoft.com/dotnet/tune-in-for-fsharpconf-2023/",
+    });
+    const targetBlog = returnedBlogs[0].toJSON();
+    const blog = { ...targetBlog, likes: targetBlog.likes + 1 };
+
+    const res = await api
+      .put(`/api/blogs/${targetBlog.id}`)
+      .send(blog)
+      .expect(200);
+
+    expect(res.body).toEqual(blog);
+  });
+
+  test("bad request if title is cleared", async () => {
+    const returnedBlogs = await Blog.find({
+      url: "https://devblogs.microsoft.com/dotnet/tune-in-for-fsharpconf-2023/",
+    });
+    const targetBlog = returnedBlogs[0].toJSON();
+    const blog = { ...targetBlog, title: "" };
+
+    await api.put(`/api/blogs/${targetBlog.id}`).send(blog).expect(400);
+  });
+
+  test("bad request if url is cleared", async () => {
+    const returnedBlogs = await Blog.find({
+      url: "https://devblogs.microsoft.com/dotnet/tune-in-for-fsharpconf-2023/",
+    });
+    const targetBlog = returnedBlogs[0].toJSON();
+    const blog = { ...targetBlog, url: "" };
+
+    await api.put(`/api/blogs/${targetBlog.id}`).send(blog).expect(400);
+  });
+
+  test("bad request if id is malformed", async () => {
+    const id = "jfdlka";
+
+    const res = await api.put(`/api/blogs/${id}`);
 
     expect(res.status).toBe(400);
     expect(res.body).toEqual({ error: "malformed id" });
