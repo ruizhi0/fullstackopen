@@ -3,5 +3,6 @@ Content-Type: application/json
 
 {
    "content": "Morgan documentation isn't the best",
-   "important": true
+   "important": true,
+   "userId": "64984b253e56fca8f747789a"
 }
