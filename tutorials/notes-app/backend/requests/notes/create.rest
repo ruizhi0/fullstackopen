@@ -1,5 +1,6 @@
 POST http://localhost:3001/api/notes
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InpoaSIsImlkIjoiNjQ5ODRiMjUzZTU2ZmNhOGY3NDc3ODlhIiwiaWF0IjoxNjg4NDgxNDQ3fQ.IsHEzAvmZ852Jn5ayrDvtT5fTeyaUswu23zEsa3rxeg
 
 {
    "content": "Morgan documentation isn't the best",
