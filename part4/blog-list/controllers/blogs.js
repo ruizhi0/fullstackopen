@@ -12,6 +12,11 @@ blogsRouter.get("/", async (req, res) => {
 blogsRouter.post("/", async (req, res) => {
   const body = req.body;
   const user = req.user;
+  if (!user) {
+    return res.status(401).json({
+      error: "missing user",
+    });
+  }
 
   const blog = new Blog({
     title: body.title,

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 const supertest = require("supertest");
 const app = require("../app");
 const Blog = require("../models/blog");
@@ -8,25 +9,46 @@ const api = supertest(app);
 const initialBlogs = [
   {
     title: "Get ready for fsharpConf 2023!",
-    author: "Petr Semkin",
     url: "https://devblogs.microsoft.com/dotnet/tune-in-for-fsharpconf-2023/",
     likes: 1,
   },
   {
     title: "Introducing the New T4 Command-Line Tool for .NET",
-    author: "Mike Corsaro",
     url: "https://devblogs.microsoft.com/dotnet/t4-command-line-tool-for-dotnet/",
     likes: 3,
   },
 ];
 
+const initialUser = {
+  username: "root",
+  name: "root",
+  password: "root",
+};
+
 let user;
 
 beforeEach(async () => {
   await Blog.deleteMany({});
+  await User.deleteMany({});
 
-  user = await User.findOne({});
-  user = user.toJSON();
+  const passwordHash = await bcrypt.hash(initialUser.password, 10);
+  const createdUser = await new User({
+    username: initialUser.username,
+    name: initialUser.name,
+    passwordHash,
+  }).save();
+
+  const loginRes = await api
+    .post("/api/logins")
+    .send(initialUser)
+    .expect(200)
+    .expect("Content-Type", /application\/json/);
+
+  user = {
+    id: createdUser._id,
+    username: loginRes.body.username,
+    token: loginRes.body.token,
+  };
 
   const blogs = initialBlogs.map(
     (blog) =>
@@ -75,15 +97,14 @@ describe("create a new blog", () => {
   test("filled all fields", async () => {
     const newBlog = {
       title: "Microsoft Forms Service's Journey to .NET 6",
-      author: "Ray Yao",
       url: "https://devblogs.microsoft.com/dotnet/microsoft-forms-services-journey-to-dotnet-6/",
       likes: 2,
-      user: user.id,
     };
 
     await api
       .post("/api/blogs")
       .send(newBlog)
+      .set("Authorization", `Bearer ${user.token}`)
       .expect(201)
       .expect("Content-Type", /application\/json/);
 
@@ -94,10 +115,9 @@ describe("create a new blog", () => {
     const createdBlog = latestBlogs.filter(
       (blog) =>
         blog.title === newBlog.title &&
-        blog.author === newBlog.author &&
         blog.url === newBlog.url &&
         blog.likes === newBlog.likes &&
-        blog.user === newBlog.user
+        blog.user === user.id
     )[0];
     expect(createdBlog).not.toBeNull();
   });
@@ -105,14 +125,13 @@ describe("create a new blog", () => {
   test("likes default to zero if unspecified", async () => {
     const newBlog = {
       title: "Microsoft Forms Service's Journey to .NET 6",
-      author: "Ray Yao",
       url: "https://devblogs.microsoft.com/dotnet/microsoft-forms-services-journey-to-dotnet-6/",
-      user: user.id,
     };
 
     await api
       .post("/api/blogs")
       .send(newBlog)
+      .set("Authorization", `Bearer ${user.token}`)
       .expect(201)
       .expect("Content-Type", /application\/json/);
 
@@ -127,10 +146,13 @@ describe("create a new blog", () => {
     const newBlog = {
       author: "Ray Yao",
       url: "https://devblogs.microsoft.com/dotnet/microsoft-forms-services-journey-to-dotnet-6/",
-      user: user.id,
     };
 
-    const res = await api.post("/api/blogs").send(newBlog).expect(400);
+    const res = await api
+      .post("/api/blogs")
+      .send(newBlog)
+      .set("Authorization", `Bearer ${user.token}`)
+      .expect(400);
 
     expect(res.body).toEqual({
       error: "Blog validation failed: title: Path `title` is required.",
@@ -140,28 +162,29 @@ describe("create a new blog", () => {
   test("bad request if url is unspecified", async () => {
     const newBlog = {
       title: "Microsoft Forms Service's Journey to .NET 6",
-      author: "Ray Yao",
-      user: user.id,
     };
 
-    const res = await api.post("/api/blogs").send(newBlog).expect(400);
+    const res = await api
+      .post("/api/blogs")
+      .send(newBlog)
+      .set("Authorization", `Bearer ${user.token}`)
+      .expect(400);
 
     expect(res.body).toEqual({
       error: "Blog validation failed: url: Path `url` is required.",
     });
   });
 
-  test("bad request if user is unspecified", async () => {
+  test("unauthorized if no bearer token passed", async () => {
     const newBlog = {
       title: "Microsoft Forms Service's Journey to .NET 6",
-      author: "Ray Yao",
       url: "https://devblogs.microsoft.com/dotnet/microsoft-forms-services-journey-to-dotnet-6/",
       likes: 2,
     };
 
-    const res = await api.post("/api/blogs").send(newBlog).expect(400);
+    const res = await api.post("/api/blogs").send(newBlog).expect(401);
 
-    expect(res.body.error).toMatch(/missing user id/);
+    expect(res.body.error).toMatch(/missing user/);
   });
 });
 
@@ -171,19 +194,27 @@ describe("delete a blog", () => {
     const existingBlog = latestBlogs[0].toJSON();
     const id = existingBlog.id;
 
-    await api.delete(`/api/blogs/${id}`).expect(204);
+    await api
+      .delete(`/api/blogs/${id}`)
+      .set("Authorization", `Bearer ${user.token}`)
+      .expect(204);
   });
 
   test("not found blog", async () => {
     const id = "000000000000000000000000";
 
-    await api.delete(`/api/blogs/${id}`).expect(404);
+    await api
+      .delete(`/api/blogs/${id}`)
+      .set("Authorization", `Bearer ${user.token}`)
+      .expect(404);
   });
 
   test("bad request if id is malformed", async () => {
     const id = "jfdlka";
 
-    const res = await api.delete(`/api/blogs/${id}`);
+    const res = await api
+      .delete(`/api/blogs/${id}`)
+      .set("Authorization", `Bearer ${user.token}`);
 
     expect(res.status).toBe(400);
     expect(res.body).toEqual({ error: "malformed id" });
