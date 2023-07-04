@@ -3,7 +3,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Inpoa
 Content-Type: application/json
 
 {
-  "title": "Finally with JWT",
-  "url": "https://microsoft.com/",
-  "likes": 10
+  "title": "JWT with middleware",
+  "url": "https://example.com/",
+  "likes": 999
 }
