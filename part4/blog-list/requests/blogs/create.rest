@@ -1,10 +1,9 @@
 POST http://localhost:3003/api/blogs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InpoaSIsImlkIjoiNjRhNDM2MWY2ODNhMDBlZmU2ZWEwZDI0IiwiaWF0IjoxNjg4NTAwNDEyLCJleHAiOjE2ODg1MDQwMTJ9.C1ieNjsM4m4QN_rlGGfuc1tYiwiWOrkUGpZ7Qj3_oCY
 Content-Type: application/json
 
 {
-  "title": "Determination leads to success",
-  "author": "Z",
+  "title": "Finally with JWT",
   "url": "https://microsoft.com/",
-  "likes": 10,
-  "user": "64a4361f683a00efe6ea0d24"
+  "likes": 10
 }

@@ -1,11 +1,11 @@
 const errorHandler = (error, req, res, next) => {
   switch (error.name) {
     case "CastError":
-      res.status(400).json({ error: "malformed id" });
-      break;
+      return res.status(400).json({ error: "malformed id" });
     case "ValidationError":
-      res.status(400).json({ error: error.message });
-      break;
+      return res.status(400).json({ error: error.message });
+    case "JsonWebTokenError":
+      return res.status(400).json({ error: error.message });
   }
 
   next(error);
