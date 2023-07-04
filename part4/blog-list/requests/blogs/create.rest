@@ -5,5 +5,6 @@ Content-Type: application/json
   "title": "Determination leads to success",
   "author": "Z",
   "url": "https://microsoft.com/",
-  "likes": 10
+  "likes": 10,
+  "user": "64a4361f683a00efe6ea0d24"
 }

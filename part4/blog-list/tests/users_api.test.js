@@ -40,6 +40,14 @@ describe("get users", () => {
       expect(user.passwordHash).toBeUndefined();
     });
   });
+
+  test("each user has 'blogs' field", async () => {
+    const res = await api.get("/api/users").expect(200);
+
+    res.body.forEach((user) => {
+      expect(user.blogs).toEqual([]);
+    });
+  });
 });
 
 describe("create a user", () => {

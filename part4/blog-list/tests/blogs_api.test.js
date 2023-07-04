@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const supertest = require("supertest");
 const app = require("../app");
 const Blog = require("../models/blog");
+const User = require("../models/user");
 
 const api = supertest(app);
 const initialBlogs = [
@@ -19,10 +20,22 @@ const initialBlogs = [
   },
 ];
 
+let user;
+
 beforeEach(async () => {
   await Blog.deleteMany({});
 
-  const blogs = initialBlogs.map((blog) => new Blog(blog));
+  user = await User.findOne({});
+  user = user.toJSON();
+
+  const blogs = initialBlogs.map(
+    (blog) =>
+      new Blog({
+        ...blog,
+        user: user.id,
+      })
+  );
+
   const promises = blogs.map((blog) => blog.save());
   await Promise.all(promises);
 });
@@ -48,6 +61,14 @@ describe("get blogs", () => {
       expect(blog.id).toBeDefined();
     });
   });
+
+  test("each blog has 'user' association", async () => {
+    const res = await api.get("/api/blogs");
+
+    res.body.forEach((blog) => {
+      expect(blog.user).toBeDefined();
+    });
+  });
 });
 
 describe("create a new blog", () => {
@@ -57,6 +78,7 @@ describe("create a new blog", () => {
       author: "Ray Yao",
       url: "https://devblogs.microsoft.com/dotnet/microsoft-forms-services-journey-to-dotnet-6/",
       likes: 2,
+      user: user.id,
     };
 
     await api
@@ -69,6 +91,15 @@ describe("create a new blog", () => {
     expect(latestBlogs).toHaveLength(initialBlogs.length + 1);
     const titles = latestBlogs.map((blog) => blog.title);
     expect(titles).toContain(newBlog.title);
+    const createdBlog = latestBlogs.filter(
+      (blog) =>
+        blog.title === newBlog.title &&
+        blog.author === newBlog.author &&
+        blog.url === newBlog.url &&
+        blog.likes === newBlog.likes &&
+        blog.user === newBlog.user
+    )[0];
+    expect(createdBlog).not.toBeNull();
   });
 
   test("likes default to zero if unspecified", async () => {
@@ -76,6 +107,7 @@ describe("create a new blog", () => {
       title: "Microsoft Forms Service's Journey to .NET 6",
       author: "Ray Yao",
       url: "https://devblogs.microsoft.com/dotnet/microsoft-forms-services-journey-to-dotnet-6/",
+      user: user.id,
     };
 
     await api
@@ -95,6 +127,7 @@ describe("create a new blog", () => {
     const newBlog = {
       author: "Ray Yao",
       url: "https://devblogs.microsoft.com/dotnet/microsoft-forms-services-journey-to-dotnet-6/",
+      user: user.id,
     };
 
     const res = await api.post("/api/blogs").send(newBlog).expect(400);
@@ -108,6 +141,7 @@ describe("create a new blog", () => {
     const newBlog = {
       title: "Microsoft Forms Service's Journey to .NET 6",
       author: "Ray Yao",
+      user: user.id,
     };
 
     const res = await api.post("/api/blogs").send(newBlog).expect(400);
@@ -115,6 +149,19 @@ describe("create a new blog", () => {
     expect(res.body).toEqual({
       error: "Blog validation failed: url: Path `url` is required.",
     });
+  });
+
+  test("bad request if user is unspecified", async () => {
+    const newBlog = {
+      title: "Microsoft Forms Service's Journey to .NET 6",
+      author: "Ray Yao",
+      url: "https://devblogs.microsoft.com/dotnet/microsoft-forms-services-journey-to-dotnet-6/",
+      likes: 2,
+    };
+
+    const res = await api.post("/api/blogs").send(newBlog).expect(400);
+
+    expect(res.body.error).toMatch(/missing user id/);
   });
 });
 
