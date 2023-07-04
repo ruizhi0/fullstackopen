@@ -1,3 +1,6 @@
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
+
 const errorHandler = (error, req, res, next) => {
   switch (error.name) {
     case "CastError":
@@ -20,7 +23,24 @@ const tokenExtractor = (req, res, next) => {
   next();
 };
 
+const userExtractor = async (req, res, next) => {
+  if (req.token) {
+    const decodedToken = jwt.verify(req.token, process.env.SECRET);
+    if (!decodedToken) {
+      return res.status(401).json({
+        error: "invalid token",
+      });
+    }
+
+    const user = await User.findById(decodedToken.id);
+    req.user = user;
+  }
+
+  next();
+};
+
 module.exports = {
   errorHandler,
   tokenExtractor,
+  userExtractor,
 };
