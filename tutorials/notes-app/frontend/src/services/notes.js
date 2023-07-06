@@ -1,26 +1,23 @@
-import axios from "axios";
-const baseUrl = "/api/notes";
+import axios from 'axios'
+const baseUrl = '/api/notes'
 
 const getAll = () => {
-  return axios
-    .get(baseUrl)
-    .then((res) => res.data)
-    .catch((error) => console.log("failed with error", error));
-};
+  const request = axios.get(baseUrl)
+  return request.then(response => response.data)
+}
 
-const create = (newObject) => {
-  return axios
-    .post(baseUrl, newObject)
-    .then((res) => res.data)
-    .catch((error) => console.log("failed with error", error));
-};
+const create = newObject => {
+  const request = axios.post(baseUrl, newObject)
+  return request.then(response => response.data)
+}
 
 const update = (id, newObject) => {
-  return axios.put(`${baseUrl}/${id}`, newObject).then((res) => res.data);
-};
+  const request = axios.put(`${baseUrl}/${id}`, newObject)
+  return request.then(response => response.data)
+}
 
-export default {
-  getAll,
-  create,
-  update,
-};
+export default { 
+  getAll, 
+  create, 
+  update 
+}
